@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Arizona RP | Топ‑5 модов</title>
+    <!-- Favicon (SVG DataURI) -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23a1a1a1'/%3E%3Ctext x='50' y='68' font-size='60' font-weight='bold' text-anchor='middle' fill='white' font-family='monospace'%3EAZ%3C/text%3E%3C/svg%3E">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0b0b0f;
+            color: #f0f0f0;
+            line-height: 1.5;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Анимированный фон "ARZ" */
+        #arCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            opacity: 0.4;
+        }
+
+        .container {
+            position: relative;
+            z-index: 2;
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+
+        /* Шапка с кнопкой продавца */
+        .page-header {
+            text-align: center;
+            margin-bottom: 3rem;
+            animation: fadeInDown 0.6s ease;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 1rem;
+        }
+
+        .seller-btn {
+            background: rgba(161, 161, 161, 0.15);
+            border: 1px solid #a1a1a1;
+            border-radius: 60px;
+            padding: 8px 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #e0e0e0;
+            cursor: default;
+            transition: all 0.2s;
+            backdrop-filter: blur(4px);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            letter-spacing: 0.3px;
+            opacity: 0.9;
+        }
+
+        .seller-btn i {
+            font-size: 1rem;
+            color: #a1a1a1;
+        }
+
+        .seller-btn.disabled {
+            pointer-events: none;
+        }
+
+        .page-header h1 {
+            font-size: 2.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #ffffff, #a1a1a1);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            letter-spacing: -0.5px;
+            margin-bottom: 0.5rem;
+        }
+
+        .page-header p {
+            font-size: 1.1rem;
+            color: #b0b0c0;
+            border-bottom: 1px dashed #3a3a44;
+            display: inline-block;
+            padding-bottom: 6px;
+        }
+
+        /* Сетка карточек */
+        .mods-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Карточка */
+        .mod-card {
+            background: rgba(16, 16, 22, 0.75);
+            backdrop-filter: blur(12px);
+            border-radius: 32px;
+            border: 1px solid rgba(161, 161, 161, 0.3);
+            overflow: hidden;
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+            box-shadow: 0 20px 30px -12px rgba(0, 0, 0, 0.4);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .mod-card:hover {
+            transform: translateY(-6px);
+            border-color: rgba(161, 161, 161, 0.7);
+            box-shadow: 0 28px 36px -14px rgba(0, 0, 0, 0.6);
+        }
+
+        /* Ранг (место) */
+        .rank {
+            background: linear-gradient(135deg, #1e1e2a, #121217);
+            padding: 0.7rem 1.2rem;
+            font-weight: 700;
+            font-size: 1.2rem;
+            border-bottom: 1px solid #a1a1a160;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .rank i {
+            color: #a1a1a1;
+            font-size: 1.2rem;
+        }
+
+        .rank span {
+            background: #a1a1a1;
+            color: #0b0b0f;
+            padding: 2px 10px;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            margin-left: auto;
+        }
+
+        /* Контейнер для скриншота */
+        .screenshot-container {
+            margin: 1rem 1rem 0 1rem;
+            border-radius: 24px;
+            overflow: hidden;
+            background: #0c0c12;
+            min-height: 180px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .screenshot-img {
+            width: 100%;
+            height: auto;
+            display: block;
+            object-fit: cover;
+            max-height: 200px;
+            border-radius: 24px;
+        }
+
+        .screenshot-placeholder {
+            background: #0c0c12;
+            aspect-ratio: 16 / 9;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            border: 1px dashed #5a5a6a;
+            color: #a1a1a1;
+            min-height: 180px;
+            border-radius: 24px;
+        }
+
+        .screenshot-placeholder i {
+            font-size: 3rem;
+            opacity: 0.6;
+        }
+
+        .screenshot-placeholder p {
+            font-size: 0.85rem;
+            font-weight: 500;
+            background: #1a1a24;
+            padding: 5px 12px;
+            border-radius: 60px;
+        }
+
+        /* Контент карточки */
+        .card-content {
+            padding: 1.2rem 1.5rem 1.5rem 1.5rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .mod-name {
+            font-size: 1.65rem;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .mod-name i {
+            color: #a1a1a1;
+            font-size: 1.4rem;
+        }
+
+        .description {
+            color: #cdd9f5;
+            font-size: 0.9rem;
+            margin: 0.8rem 0 1rem 0;
+            line-height: 1.45;
+            opacity: 0.9;
+        }
+
+        .command {
+            background: #0e0e12;
+            border-radius: 60px;
+            padding: 6px 14px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-family: monospace;
+            font-size: 0.85rem;
+            border: 1px solid #4a4a58;
+            margin-top: auto;
+            width: fit-content;
+        }
+
+        .command i {
+            color: #a1a1a1;
+        }
+
+        /* Кнопка blast.hk */
+        .blast-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background: rgba(161, 161, 161, 0.12);
+            border: 1px solid #a1a1a1;
+            border-radius: 50px;
+            padding: 8px 20px;
+            margin-top: 1rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #e0e0e0;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            width: fit-content;
+            cursor: pointer;
+        }
+
+        .blast-btn i {
+            font-size: 1rem;
+            color: #a1a1a1;
+            transition: color 0.2s;
+        }
+
+        .blast-btn:hover {
+            background: #a1a1a1;
+            border-color: #ffffff;
+            color: #0b0b0f;
+            transform: scale(1.02);
+        }
+
+        .blast-btn:hover i {
+            color: #0b0b0f;
+        }
+
+        .footer-tag {
+            margin-top: 0.8rem;
+            font-size: 0.7rem;
+            color: #7a7a8a;
+            text-align: right;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 700px) {
+            .container {
+                padding: 1.2rem;
+            }
+            .page-header h1 {
+                font-size: 2rem;
+            }
+            .mod-name {
+                font-size: 1.4rem;
+            }
+            .mods-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<canvas id="arCanvas"></canvas>
+
+<div class="container">
+    <div class="page-header">
+        <div class="header-top">
+            <div class="seller-btn disabled">
+                <i class="fas fa-user-shield"></i> Продавец: ShizzyBoost
+            </div>
+        </div>
+        <h1><i class="fas fa-crown"></i> Топ‑5 модов для Arizona RP</h1>
+        <p>Лучшие дополнения для удобной игры и глубокого отыгрыша</p>
+    </div>
+
+    <div class="mods-grid" id="modsGrid">
+        <!-- Моды будут динамически загружены через JavaScript -->
+    </div>
+</div>
+
+<script>
+    // ============================================
+    // 👇 ВСТАВЛЯЙТЕ ССЫЛКИ НА СКРИНШОТЫ ЗДЕСЬ 👇
+    // ============================================
+    const screenshots = {
+        mod1: "https://www.blast.hk/attachments/246749/",  // Ссылка для Justice Helper
+        mod2: "https://www.blast.hk/attachments/225655/",  // Ссылка для Hospital Helper
+        mod3: "https://sun9-81.userapi.com/s/v1/ig2/B9hGNgQrqpvMzwohmnKaQDFX1ajUQfoJE08PyzoIErSfVhU36JYPF9DZKGKwiSQJF9rXb6I6mykKK8SqcVXysAEq.jpg?quality=95&as=32x22,48x33,72x50,108x75,160x111,240x166,360x249,480x332,540x374,640x443,673x466&from=bu&u=oww6HrFGkQuuv4r9Kx1xVIMXBoLu-hrF3iHWwMOZhOw&cs=673x0",  // Ссылка для SMI Helper
+        mod4: "https://www.blast.hk/attachments/267881/",  // Ссылка для Auto Door
+        mod5: "https://www.blast.hk/attachments/268942/",   // Ссылка для UUUUU
+		mod6: "https://sun9-75.userapi.com/s/v1/ig2/K2GSZlSSzbUGBgin7ElSym_ybkmmtzaygW2ryrKcO97LkBlN12rNFYhgX055TGjIpibWz3yn9RbSJOgV5BQ484Gv.jpg?quality=95&as=32x22,48x34,72x51,108x76,160x112,240x169,360x253,480x337,540x379,629x442&from=bu&u=ZWPUgLmIav7THbRW5I9xizxyjNyjzAvsZ9UHPYJUvGY&cs=629x0"   // Ссылка для UUUUU
+    };
+    // ============================================
+    // Пример: screenshots.mod1 = "https://example.com/screenshot1.jpg";
+    // ============================================
+
+    // Данные модов
+    const modsData = [
+        {
+            id: 1,
+            name: "Justice Helper",
+            icon: "fas fa-balance-scale",
+            rank: "#1",
+            rankBadge: "Автор: MTG MODS",
+            description: "Помогает для РП ситуаций (к примеру просьба попросить паспорт). Можно максимально быстро отыгрывать реплики персонажа для фракций МЮ, ФБР и МО.",
+            command: "/jh",
+            commandDesc: "Активация", 
+            footerTag: '<i class="fas fa-robot"></i> Ускоряет отыгрыш',
+            screenshotUrl: screenshots.mod1
+        },
+        {
+            id: 2,
+            name: "Hospital Helper",
+            icon: "fas fa-hospital-user",
+            rank: "#2",
+            rankBadge: "Автор: MTG MODS",
+            description: "Помогает отыгрывать РП (к примеру выписать лекарство). Можно быстро выдавать рецепты или мед.карты для сотрудников Больниц.",
+            command: "/hh",
+            commandDesc: "Активация",
+            footerTag: '<i class="fas fa-prescription-bottle"></i> Быстрая мед. документация',
+            screenshotUrl: screenshots.mod2
+        },
+        {
+            id: 3,
+            name: "SMI Helper",
+            icon: "fas fa-edit",
+            rank: "#3",
+            rankBadge: "Автор: MTG MODS",
+            description: "Меняет окно редактирования объявления для облегчения редактирования. В разы ускоряет редакцию объявления.",
+            command: "/smi",
+            commandDesc: "Активация",
+            footerTag: '<i class="fas fa-marker"></i> Удобный редактор',
+            screenshotUrl: screenshots.mod3
+        },
+        {
+            id: 4,
+            name: "Auto Door",
+            icon: "fas fa-door-open",
+            rank: "#4",
+            rankBadge: "Автор: MTG MODS",
+            description: "Автоматически открывает двери в интерьерах, шлагбаумов и КПП (вместо активации на H или через команду /opengate). Комфорт и скорость.",
+            command: "автоматически / настройки",
+            commandDesc: "Активация",
+            footerTag: '<i class="fas fa-car"></i> Не отвлекает от игры',
+            screenshotUrl: screenshots.mod4
+        },
+        {
+            id: 5,
+            name: "Deposite Calculator",
+            icon: "fas fa-bank",
+            rank: "#5",
+            rankBadge: "Автор: MTG MODS",
+            description: "Данный скрипт может помочь вам в подсчете прибыли с депозита при различных условиях с гибкой настройкой Данный скрипт работает на ПК, и так-же на Arizona Mobile",
+            command: "/deposite - главное меню",
+            commandDesc: "Активация",
+            footerTag: '<i class="fas fa-bolt"></i> Эксклюзивный функционал',
+            screenshotUrl: screenshots.mod5
+        },
+		 {
+            id: 6,
+            name: "Fire Departament Helper",
+            icon: "fas fa-fire",
+            rank: "#6",
+            rankBadge: "Автор: MTG MODS",
+            description: "Данный скрипт может помочь вам в подсчете прибыли с депозита при различных условиях с гибкой настройкой Данный скрипт работает на ПК, и так-же на Arizona Mobile",
+            command: "/fh",
+            commandDesc: "Активация",
+            footerTag: '<i class="fas fa-bolt"></i> Эксклюзивный функционал',
+            screenshotUrl: screenshots.mod6
+        }
+    ];
+
+    // Создание блока скриншота
+    function createScreenshotBlock(url) {
+        const container = document.createElement('div');
+        container.className = 'screenshot-container';
+        
+        if (url && url.trim() !== "") {
+            // Пытаемся загрузить изображение
+            const img = new Image();
+            img.onload = function() {
+                const imgElement = document.createElement('img');
+                imgElement.src = url;
+                imgElement.alt = "Скриншот мода";
+                imgElement.className = "screenshot-img";
+                imgElement.style.width = "100%";
+                imgElement.style.height = "auto";
+                imgElement.style.maxHeight = "200px";
+                imgElement.style.objectFit = "cover";
+                container.innerHTML = '';
+                container.appendChild(imgElement);
+            };
+            img.onerror = function() {
+                // Если изображение не загрузилось, показываем плейсхолдер
+                const placeholder = document.createElement('div');
+                placeholder.className = 'screenshot-placeholder';
+                placeholder.innerHTML = `
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <p>⚠️ Не удалось загрузить скриншот</p>
+                    <small style="font-size: 0.7rem;">Проверьте ссылку</small>
+                `;
+                container.appendChild(placeholder);
+            };
+            img.src = url;
+        } else {
+            // Если ссылка пустая, показываем плейсхолдер
+            const placeholder = document.createElement('div');
+            placeholder.className = 'screenshot-placeholder';
+            placeholder.innerHTML = `
+                <i class="fas fa-camera-retro"></i>
+                <p>📸 Скриншот будет добавлен</p>
+                <small style="font-size: 0.7rem;">Вставьте ссылку в код</small>
+            `;
+            container.appendChild(placeholder);
+        }
+        
+        return container;
+    }
+
+    // Создание карточки мода
+    function createModCard(mod) {
+        const card = document.createElement('div');
+        card.className = 'mod-card';
+        
+        // Ранг
+        const rankDiv = document.createElement('div');
+        rankDiv.className = 'rank';
+        rankDiv.innerHTML = `
+            <i class="${mod.icon}"></i> ${mod.rank}
+            <span>${mod.rankBadge}</span>
+        `;
+        card.appendChild(rankDiv);
+        
+        // Скриншот блок
+        const screenshotBlock = createScreenshotBlock(mod.screenshotUrl);
+        card.appendChild(screenshotBlock);
+        
+        // Контент
+        const contentDiv = document.createElement('div');
+        contentDiv.className = 'card-content';
+        contentDiv.innerHTML = `
+            <div class="mod-name">
+                <i class="${mod.icon}"></i> ${mod.name}
+            </div>
+            <div class="description">
+                ${mod.description}
+            </div>
+            <div class="command">
+                <i class="fas fa-terminal"></i> ${mod.commandDesc}: <strong>${mod.command}</strong>
+            </div>
+
+            <div class="footer-tag">
+                ${mod.footerTag}
+            </div>
+        `;
+        card.appendChild(contentDiv);
+        
+        return card;
+    }
+
+    // Рендер всех модов
+    function renderMods() {
+        const grid = document.getElementById('modsGrid');
+        grid.innerHTML = '';
+        modsData.forEach(mod => {
+            const card = createModCard(mod);
+            grid.appendChild(card);
+        });
+    }
+
+    // Инициализация
+    renderMods();
+
+    // ----- АНИМИРОВАННЫЙ ФОН "ARZ" (летающие буквы) -----
+    const canvas = document.getElementById('arCanvas');
+    let ctx = canvas.getContext('2d');
+    let width, height;
+    let particles = [];
+
+    function initCanvas() {
+        width = window.innerWidth;
+        height = window.innerHeight;
+        canvas.width = width;
+        canvas.height = height;
+
+        const particleCount = Math.min(70, Math.floor(width * height / 11000));
+        for (let i = 0; i < particleCount; i++) {
+            particles.push({
+                x: Math.random() * width,
+                y: Math.random() * height,
+                vx: (Math.random() - 0.5) * 0.7,
+                vy: (Math.random() - 0.5) * 0.7,
+                size: 18 + Math.random() * 28,
+                opacity: 0.1 + Math.random() * 0.2,
+                text: ['ARZ', 'HUB', 'ARZ'][Math.floor(Math.random() * 3)],
+                rotation: Math.random() * Math.PI * 2,
+                rotSpeed: (Math.random() - 0.5) * 0.012
+            });
+        }
+    }
+
+    function drawParticles() {
+        if (!ctx) return;
+        ctx.clearRect(0, 0, width, height);
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+
+        for (let p of particles) {
+            p.x += p.vx;
+            p.y += p.vy;
+            p.rotation += p.rotSpeed;
+
+            if (p.x < -60) p.x = width + 60;
+            if (p.x > width + 60) p.x = -60;
+            if (p.y < -60) p.y = height + 60;
+            if (p.y > height + 60) p.y = -60;
+
+            ctx.save();
+            ctx.translate(p.x, p.y);
+            ctx.rotate(p.rotation);
+            ctx.font = `${p.size}px "Inter", "Segoe UI", monospace`;
+            ctx.fillStyle = `rgba(161, 161, 161, ${p.opacity})`;
+            ctx.fillText(p.text, 0, 0);
+            ctx.restore();
+        }
+        requestAnimationFrame(drawParticles);
+    }
+
+    function handleResize() {
+        width = window.innerWidth;
+        height = window.innerHeight;
+        canvas.width = width;
+        canvas.height = height;
+        particles = [];
+        const particleCount = Math.min(70, Math.floor(width * height / 11000));
+        for (let i = 0; i < particleCount; i++) {
+            particles.push({
+                x: Math.random() * width,
+                y: Math.random() * height,
+                vx: (Math.random() - 0.5) * 0.7,
+                vy: (Math.random() - 0.5) * 0.7,
+                size: 18 + Math.random() * 28,
+                opacity: 0.1 + Math.random() * 0.2,
+                text: ['A', 'R', 'Z'][Math.floor(Math.random() * 3)],
+                rotation: Math.random() * Math.PI * 2,
+                rotSpeed: (Math.random() - 0.5) * 0.012
+            });
+        }
+    }
+
+    window.addEventListener('resize', handleResize);
+    initCanvas();
+    drawParticles();
+</script>
+</body>
+</html>
