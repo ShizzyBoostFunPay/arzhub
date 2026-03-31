@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Arizona HUB — Список промокодов</title>
+    <!-- Favicon (SVG DataURI + PNG fallback) -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23a1a1a1'/%3E%3Ctext x='50' y='68' font-size='60' font-weight='bold' text-anchor='middle' fill='white' font-family='monospace'%3EAZ%3C/text%3E%3C/svg%3E">
+    <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAYAAABw4pVUAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAABdSURBVHhe7c4xDQAwDMCwEv7P1A6QkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJDwAQqyAAGnD/34AAAAAElFTkSuQmCC">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0b0b0f;
+            color: #f0f0f0;
+            line-height: 1.4;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* CANVAS АНИМАЦИОННЫЙ ФОН */
+        #arCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            opacity: 0.5;
+        }
+
+        .container {
+            position: relative;
+            z-index: 2;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+
+        /* header с кнопкой продавца */
+        .hub-header {
+            text-align: center;
+            margin-bottom: 2.8rem;
+            animation: fadeInUp 0.8s ease-out;
+            position: relative;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .seller-btn {
+            background: rgba(161, 161, 161, 0.15);
+            border: 1px solid #a1a1a1;
+            border-radius: 60px;
+            padding: 8px 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #e0e0e0;
+            cursor: default;
+            transition: all 0.2s;
+            backdrop-filter: blur(4px);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            letter-spacing: 0.3px;
+            opacity: 0.9;
+        }
+
+        .seller-btn i {
+            font-size: 1rem;
+            color: #a1a1a1;
+        }
+
+        .seller-btn.disabled {
+            pointer-events: none;
+            filter: grayscale(0.1);
+        }
+
+        .hub-header h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #ffffff, #a1a1a1);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            letter-spacing: -0.5px;
+            margin-bottom: 0.5rem;
+        }
+
+        .hub-header p {
+            font-size: 1.1rem;
+            color: #c0c0c0;
+            border-bottom: 1px dashed #3a3a44;
+            display: inline-block;
+            padding-bottom: 6px;
+        }
+
+        /* панель поиска */
+        .search-panel {
+            background: rgba(20, 20, 28, 0.75);
+            backdrop-filter: blur(12px);
+            border-radius: 60px;
+            padding: 0.5rem 1rem 0.5rem 1.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-bottom: 2.5rem;
+            border: 1px solid rgba(161, 161, 161, 0.4);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+            transition: all 0.2s;
+        }
+
+        .search-wrapper {
+            flex: 2;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #0e0e12cc;
+            border-radius: 48px;
+            padding: 0.3rem 1rem;
+            border: 1px solid #5a5a6a;
+        }
+
+        .search-wrapper i {
+            color: #a1a1a1;
+            font-size: 1.2rem;
+        }
+
+        .search-wrapper input {
+            background: transparent;
+            border: none;
+            padding: 12px 0;
+            font-size: 1rem;
+            width: 100%;
+            color: #ffffff;
+            outline: none;
+            font-weight: 500;
+        }
+
+        .search-wrapper input::placeholder {
+            color: #8a8a9a;
+        }
+
+        .reset-btn {
+            background: rgba(161, 161, 161, 0.2);
+            border: 1px solid #a1a1a1;
+            color: #e0e0e0;
+            padding: 10px 20px;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .reset-btn:hover {
+            background: #a1a1a1;
+            color: #0b0b0f;
+            border-color: #ffffff;
+            box-shadow: 0 0 12px rgba(161, 161, 161, 0.5);
+            transform: scale(1.02);
+        }
+
+        /* карточки секций */
+        .section-card {
+            background: rgba(16, 16, 22, 0.65);
+            backdrop-filter: blur(8px);
+            border-radius: 32px;
+            padding: 1.5rem 1rem 1.8rem 1rem;
+            margin-bottom: 2.8rem;
+            border: 1px solid rgba(161, 161, 161, 0.3);
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 20px 35px -12px rgba(0,0,0,0.4);
+        }
+
+        .section-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 25px 40px -12px rgba(0,0,0,0.5);
+            border-color: rgba(161, 161, 161, 0.6);
+        }
+
+        .section-title {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            margin-bottom: 1.5rem;
+            padding: 0 0.5rem;
+            border-left: 5px solid #a1a1a1;
+        }
+
+        .section-title h2 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+            color: #ffffff;
+        }
+
+        .section-title span {
+            background: #2a2a32cc;
+            backdrop-filter: blur(4px);
+            padding: 5px 12px;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #d0d0d0;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            border-radius: 24px;
+        }
+
+        .promo-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95rem;
+            min-width: 560px;
+        }
+
+        .promo-table th {
+            text-align: left;
+            padding: 16px 16px;
+            background: #121217cc;
+            font-weight: 600;
+            color: #eaeaea;
+            border-bottom: 2px solid #a1a1a1;
+        }
+
+        .promo-table td {
+            padding: 14px 16px;
+            border-bottom: 1px solid #2a2a32;
+            vertical-align: middle;
+        }
+
+        .promo-table tr:hover {
+            background: rgba(161, 161, 161, 0.12);
+            transition: 0.1s;
+        }
+
+        .codes-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .promo-badge {
+            background: #1c1c24dd;
+            backdrop-filter: blur(4px);
+            border-radius: 40px;
+            padding: 6px 12px 6px 16px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.85rem;
+            font-weight: 500;
+            border: 1px solid #7a7a8a;
+            transition: all 0.15s;
+        }
+
+        .promo-badge:hover {
+            background: #2a2a34;
+            border-color: #a1a1a1;
+            transform: scale(1.01);
+        }
+
+        .code-text {
+            color: #f5f5f5;
+        }
+
+        .copy-btn {
+            background: transparent;
+            border: none;
+            color: #b0b0c0;
+            cursor: pointer;
+            font-size: 0.9rem;
+            padding: 4px;
+            border-radius: 30px;
+            transition: all 0.2s;
+            width: 26px;
+            height: 26px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .copy-btn:hover {
+            color: #ffffff;
+            background: #5a5a6a;
+            transform: scale(1.1);
+        }
+
+        .empty-row td {
+            text-align: center;
+            padding: 40px;
+            color: #a1a1a1;
+            font-style: italic;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 3rem;
+            padding: 1.5rem;
+            font-size: 0.8rem;
+            color: #8a8a9a;
+            border-top: 1px solid #2a2a32;
+        }
+
+        .toast-msg {
+            position: fixed;
+            bottom: 25px;
+            left: 50%;
+            transform: translateX(-50%) scale(0.9);
+            background: #1e1e28e6;
+            backdrop-filter: blur(20px);
+            color: #ffffff;
+            padding: 12px 28px;
+            border-radius: 60px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            border: 1px solid #a1a1a1;
+            opacity: 0;
+            transition: opacity 0.2s, transform 0.2s;
+            pointer-events: none;
+            z-index: 1000;
+            white-space: nowrap;
+        }
+
+        .toast-msg.show {
+            opacity: 1;
+            transform: translateX(-50%) scale(1);
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 680px) {
+            .container {
+                padding: 1rem;
+            }
+            .hub-header h1 {
+                font-size: 2.2rem;
+            }
+            .section-title h2 {
+                font-size: 1.4rem;
+            }
+            .promo-badge {
+                padding: 4px 10px 4px 12px;
+                font-size: 0.75rem;
+            }
+            .reset-btn {
+                padding: 6px 14px;
+            }
+            .header-top {
+                justify-content: center;
+            }
+            .seller-btn {
+                font-size: 0.8rem;
+                padding: 6px 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<canvas id="arCanvas"></canvas>
+
+<div class="container">
+    <div class="hub-header">
+        <div class="header-top">
+            <div></div> <!-- пустой для баланса -->
+            <div class="seller-btn disabled">
+                <i class="fas fa-user-shield"></i> Продавец: ShizzyBoost
+            </div>
+        </div>
+        <h1><i class="fas fa-hashtag"></i> Arizona HUB</h1>
+        <p>Актуальные промокоды для всех серверов Arizona RP</p>
+    </div>
+
+    <div class="search-panel">
+        <div class="search-wrapper">
+            <i class="fas fa-search"></i>
+            <input type="text" id="filterInput" placeholder="Поиск по номеру, названию сервера или промокоду..." autocomplete="off">
+        </div>
+        <button class="reset-btn" id="resetFilterBtn"><i class="fas fa-undo-alt"></i> Сброс</button>
+    </div>
+
+    <div class="section-card" id="serversSection">
+        <div class="section-title">
+            <h2><i class="fas fa-server"></i> Основные серверы</h2>
+            <span id="serversCount">32 сервера</span>
+        </div>
+        <div class="table-wrapper">
+            <table class="promo-table" id="mainServersTable">
+                <thead>
+                    <tr><th>№</th><th>Название сервера</th><th>Промокоды</th></tr>
+                </thead>
+                <tbody id="mainServersBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="section-card" id="mobileSection">
+        <div class="section-title">
+            <h2><i class="fas fa-mobile-alt"></i> Мобильные серверы</h2>
+            <span id="mobileCount">3 сервера</span>
+        </div>
+        <div class="table-wrapper">
+            <table class="promo-table" id="mobileServersTable">
+                <thead>
+                    <tr><th>№</th><th>Название сервера</th><th>Промокоды</th></tr>
+                </thead>
+                <tbody id="mobileServersBody"></tbody>
+             </table>
+        </div>
+    </div>
+    <footer>
+        <i class="fa fa-copyright"></i> by ShizzyBoost <i class="fas fa-clock"></i> обновлен: 31 марта 2026 года.<br>
+        Arizona HUB | Все актуальные промокоды 
+    </footer>
+</div>
+<div id="toastMsg" class="toast-msg">✅ Скопировано!</div>
+
+<script>
+    // ---------- ДАННЫЕ ----------
+    const mainServers = [
+        { id: 1, name: "Phoenix", codes: ["#babetape"] },
+        { id: 2, name: "Tucson", codes: ["#берлога"] },
+        { id: 3, name: "Scottdale", codes: ["#steve"] },
+        { id: 4, name: "Chandler", codes: ["#richilox"] },
+        { id: 5, name: "Brainburg", codes: ["#bobylew"] },
+        { id: 6, name: "Saint-Rose", codes: ["#ocean"] },
+        { id: 7, name: "Mesa", codes: ["#romero"] },
+        { id: 8, name: "Red-Rock", codes: ["#bratok"] },
+        { id: 9, name: "Yuma", codes: ["#revazz"] },
+        { id: 10, name: "Surprise", codes: ["#ettore"] },
+        { id: 11, name: "Prescott", codes: ["#aher1337"] },
+        { id: 12, name: "Glendale", codes: ["#РИНЖИ"] },
+        { id: 13, name: "Kingman", codes: ["#aher"] },
+        { id: 14, name: "Winslow", codes: ["#seller"] },
+        { id: 15, name: "Payson", codes: ["#isynory"] },
+        { id: 16, name: "Gilbert", codes: ["#babetape"] },
+        { id: 17, name: "Show-Low", codes: ["#морти"] },
+        { id: 18, name: "Casa-Grande", codes: ["#arzcash", "#Венни"] },
+        { id: 19, name: "Page", codes: ["#tanker", "#лудоман"] },
+        { id: 20, name: "Sun City", codes: ["#сига"] },
+        { id: 21, name: "Queen Creek", codes: ["#covalli"] },
+        { id: 22, name: "Sedona", codes: ["#jeezly"] },
+        { id: 23, name: "Holiday", codes: ["#seller"] },
+        { id: 24, name: "Wednesday", codes: ["#Arctic"] },
+        { id: 25, name: "Yava", codes: ["#admin"] },
+        { id: 26, name: "Faraway", codes: ["#scoobydu"] },
+        { id: 27, name: "Bumble Bee", codes: ["#gta"] },
+        { id: 28, name: "Christmas", codes: ["#qwe"] },
+        { id: 29, name: "Mirage", codes: ["#луиджи"] },
+        { id: 30, name: "Love", codes: ["#sweet", "#charodey"] },
+        { id: 31, name: "Drake", codes: ["#Drake2026"] },
+        { id: 32, name: "Space", codes: ["#spacebonus"] }
+    ];
+
+    const mobileServers = [
+        { id: 1, name: "Mobile 1", codes: ["#mobile"] },
+        { id: 2, name: "Mobile 2", codes: ["#samp"] },
+        { id: 3, name: "Mobile 3", codes: ["Ждем ваш промокод"] }
+    ];
+
+    // DOM элементы
+    const mainTbody = document.getElementById("mainServersBody");
+    const mobileTbody = document.getElementById("mobileServersBody");
+    const filterInput = document.getElementById("filterInput");
+    const resetBtn = document.getElementById("resetFilterBtn");
+    const serversCountSpan = document.getElementById("serversCount");
+    const mobileCountSpan = document.getElementById("mobileCount");
+    const toastEl = document.getElementById("toastMsg");
+
+    // Toast
+    let toastTimeout = null;
+    function showToast(message = "✅ Промокод скопирован!") {
+        if (toastTimeout) clearTimeout(toastTimeout);
+        toastEl.textContent = message;
+        toastEl.classList.add("show");
+        toastTimeout = setTimeout(() => {
+            toastEl.classList.remove("show");
+        }, 1800);
+    }
+
+    async function copyToClipboard(text) {
+        try {
+            await navigator.clipboard.writeText(text);
+            showToast(`📋 Скопировано: ${text.length > 25 ? text.slice(0, 24) + '…' : text}`);
+        } catch (err) {
+            showToast("❌ Не удалось скопировать");
+        }
+    }
+
+    function renderCodesCell(codesArray) {
+        const container = document.createElement("div");
+        container.className = "codes-container";
+        for (let code of codesArray) {
+            const badge = document.createElement("div");
+            badge.className = "promo-badge";
+            const codeSpan = document.createElement("span");
+            codeSpan.className = "code-text";
+            codeSpan.textContent = code;
+            const copyButton = document.createElement("button");
+            copyButton.className = "copy-btn";
+            copyButton.innerHTML = '<i class="far fa-copy"></i>';
+            copyButton.addEventListener("click", (e) => {
+                e.stopPropagation();
+                copyToClipboard(code);
+            });
+            badge.appendChild(codeSpan);
+            badge.appendChild(copyButton);
+            container.appendChild(badge);
+        }
+        return container;
+    }
+
+    function matchesFilter(server, filterText) {
+        if (!filterText) return true;
+        const lowerFilter = filterText.toLowerCase();
+        if (server.id.toString().includes(lowerFilter)) return true;
+        if (server.name.toLowerCase().includes(lowerFilter)) return true;
+        return server.codes.some(code => code.toLowerCase().includes(lowerFilter));
+    }
+
+    function renderMainServers(filterText = "") {
+        const filtered = mainServers.filter(s => matchesFilter(s, filterText));
+        serversCountSpan.textContent = `${filtered.length} из ${mainServers.length}`;
+        mainTbody.innerHTML = "";
+        if (filtered.length === 0) {
+            const emptyRow = document.createElement("tr");
+            emptyRow.className = "empty-row";
+            const td = document.createElement("td");
+            td.colSpan = 3;
+            td.innerHTML = '<i class="fas fa-search-minus"></i> Ничего не найдено. Попробуйте другой запрос.';
+            emptyRow.appendChild(td);
+            mainTbody.appendChild(emptyRow);
+            return;
+        }
+        for (const server of filtered) {
+            const row = document.createElement("tr");
+            const tdId = document.createElement("td");
+            tdId.textContent = server.id;
+            tdId.style.fontWeight = "600";
+            const tdName = document.createElement("td");
+            tdName.textContent = server.name;
+            tdName.style.fontWeight = "500";
+            const tdCodes = document.createElement("td");
+            tdCodes.appendChild(renderCodesCell(server.codes));
+            row.appendChild(tdId);
+            row.appendChild(tdName);
+            row.appendChild(tdCodes);
+            mainTbody.appendChild(row);
+        }
+    }
+
+    function renderMobileServers(filterText = "") {
+        const filtered = mobileServers.filter(s => matchesFilter(s, filterText));
+        mobileCountSpan.textContent = `${filtered.length} из ${mobileServers.length}`;
+        mobileTbody.innerHTML = "";
+        if (filtered.length === 0) {
+            const emptyRow = document.createElement("tr");
+            emptyRow.className = "empty-row";
+            const td = document.createElement("td");
+            td.colSpan = 3;
+            td.innerHTML = '<i class="fas fa-search-minus"></i> Мобильные серверы не найдены';
+            emptyRow.appendChild(td);
+            mobileTbody.appendChild(emptyRow);
+            return;
+        }
+        for (const server of filtered) {
+            const row = document.createElement("tr");
+            const tdId = document.createElement("td");
+            tdId.textContent = server.id;
+            const tdName = document.createElement("td");
+            tdName.textContent = server.name;
+            const tdCodes = document.createElement("td");
+            tdCodes.appendChild(renderCodesCell(server.codes));
+            row.appendChild(tdId);
+            row.appendChild(tdName);
+            row.appendChild(tdCodes);
+            mobileTbody.appendChild(row);
+        }
+    }
+
+    function renderAllTables() {
+        const filterValue = filterInput.value;
+        renderMainServers(filterValue);
+        renderMobileServers(filterValue);
+    }
+
+    let debounceTimer;
+    function onFilterInput() {
+        if (debounceTimer) clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => renderAllTables(), 200);
+    }
+
+    function resetFilter() {
+        filterInput.value = "";
+        renderAllTables();
+        filterInput.focus();
+    }
+
+    // ----- АНИМИРОВАННЫЙ ФОН "ARZ" -----
+    const canvas = document.getElementById('arCanvas');
+    let ctx = canvas.getContext('2d');
+    let width, height;
+    let particles = [];
+
+    function initCanvas() {
+        width = window.innerWidth;
+        height = window.innerHeight;
+        canvas.width = width;
+        canvas.height = height;
+        
+        const particleCount = Math.min(65, Math.floor(width * height / 12000));
+        for (let i = 0; i < particleCount; i++) {
+            particles.push({
+                x: Math.random() * width,
+                y: Math.random() * height,
+                vx: (Math.random() - 0.5) * 0.6,
+                vy: (Math.random() - 0.5) * 0.6,
+                size: 18 + Math.random() * 24,
+                opacity: 0.12 + Math.random() * 0.2,
+                text: ['ARZ', 'HUB', 'ARZ'][Math.floor(Math.random() * 3)],
+                rotation: Math.random() * Math.PI * 2,
+                rotSpeed: (Math.random() - 0.5) * 0.01
+            });
+        }
+    }
+
+    function drawParticles() {
+        if (!ctx) return;
+        ctx.clearRect(0, 0, width, height);
+        ctx.font = `bold ${24}px "Inter", "Segoe UI", monospace`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        
+        for (let p of particles) {
+            p.x += p.vx;
+            p.y += p.vy;
+            p.rotation += p.rotSpeed;
+            
+            if (p.x < -50) p.x = width + 50;
+            if (p.x > width + 50) p.x = -50;
+            if (p.y < -50) p.y = height + 50;
+            if (p.y > height + 50) p.y = -50;
+            
+            ctx.save();
+            ctx.translate(p.x, p.y);
+            ctx.rotate(p.rotation);
+            ctx.font = `${p.size}px "Inter", "Segoe UI", monospace`;
+            ctx.fillStyle = `rgba(161, 161, 161, ${p.opacity})`;
+            ctx.fillText(p.text, 0, 0);
+            ctx.restore();
+        }
+        requestAnimationFrame(drawParticles);
+    }
+
+    function handleResize() {
+        width = window.innerWidth;
+        height = window.innerHeight;
+        canvas.width = width;
+        canvas.height = height;
+        particles = [];
+        const particleCount = Math.min(65, Math.floor(width * height / 12000));
+        for (let i = 0; i < particleCount; i++) {
+            particles.push({
+                x: Math.random() * width,
+                y: Math.random() * height,
+                vx: (Math.random() - 0.5) * 0.6,
+                vy: (Math.random() - 0.5) * 0.6,
+                size: 18 + Math.random() * 24,
+                opacity: 0.12 + Math.random() * 0.2,
+                text: ['A', 'R', 'Z'][Math.floor(Math.random() * 3)],
+                rotation: Math.random() * Math.PI * 2,
+                rotSpeed: (Math.random() - 0.5) * 0.01
+            });
+        }
+    }
+
+    window.addEventListener('resize', handleResize);
+    initCanvas();
+    drawParticles();
+
+    // Инициализация таблиц
+    function initTables() {
+        renderAllTables();
+        filterInput.addEventListener("input", onFilterInput);
+        resetBtn.addEventListener("click", resetFilter);
+    }
+    initTables();
+</script>
+</body>
+</html>
