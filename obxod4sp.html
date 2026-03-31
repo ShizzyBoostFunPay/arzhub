@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Arizona RP | Скрытие ЧСП проекта</title>
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23a1a1a1'/%3E%3Ctext x='50' y='68' font-size='60' font-weight='bold' text-anchor='middle' fill='white' font-family='monospace'%3EЧС%3C/text%3E%3C/svg%3E">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0b0b0f;
+            color: #f0f0f0;
+            line-height: 1.5;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Анимированный фон */
+        #arCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            opacity: 0.35;
+        }
+
+        .container {
+            position: relative;
+            z-index: 2;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+
+        /* Шапка */
+        .page-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+            animation: fadeInDown 0.6s ease;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 1rem;
+        }
+
+        .seller-btn {
+            background: rgba(161, 161, 161, 0.15);
+            border: 1px solid #a1a1a1;
+            border-radius: 60px;
+            padding: 8px 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #e0e0e0;
+            cursor: default;
+            backdrop-filter: blur(4px);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .page-header h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #ffffff, #a1a1a1);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            margin-bottom: 0.8rem;
+        }
+
+        .page-header p {
+            font-size: 1rem;
+            color: #b0b0c0;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* Основной контент */
+        .content-card {
+            background: rgba(16, 16, 22, 0.75);
+            backdrop-filter: blur(12px);
+            border-radius: 32px;
+            border: 1px solid rgba(161, 161, 161, 0.3);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            transition: transform 0.2s;
+        }
+
+        .content-card:hover {
+            border-color: rgba(161, 161, 161, 0.6);
+        }
+
+        .warning-box {
+            background: rgba(255, 100, 70, 0.1);
+            border-left: 4px solid #a1a1a1;
+            padding: 1.2rem;
+            border-radius: 20px;
+            margin-bottom: 2rem;
+        }
+
+        .warning-box h3 {
+            color: #ffaa88;
+            margin-bottom: 0.8rem;
+            font-size: 1.2rem;
+        }
+
+        .warning-box ul {
+            margin-left: 1.5rem;
+            color: #dddddd;
+        }
+
+        .warning-box li {
+            margin: 0.5rem 0;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin: 1.5rem 0 1rem 0;
+            padding-left: 1rem;
+            border-left: 5px solid #a1a1a1;
+        }
+
+        .section-subtitle {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin: 1.2rem 0 0.8rem 0;
+            color: #d0d0d0;
+        }
+
+        .method-card {
+            background: rgba(10, 10, 15, 0.6);
+            border-radius: 24px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border: 1px solid rgba(161, 161, 161, 0.2);
+        }
+
+        .method-card h3 {
+            font-size: 1.4rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .method-card h3 i {
+            color: #a1a1a1;
+        }
+
+        .list-styled {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .list-styled li {
+            margin: 0.8rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .list-styled li:before {
+            content: "▹";
+            position: absolute;
+            left: 0;
+            color: #a1a1a1;
+        }
+
+        .tips-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.2rem;
+            margin: 1.5rem 0;
+        }
+
+        .tip-item {
+            background: rgba(30, 30, 40, 0.5);
+            padding: 1rem;
+            border-radius: 20px;
+            border: 1px solid rgba(161, 161, 161, 0.2);
+        }
+
+        .tip-item i {
+            color: #a1a1a1;
+            margin-right: 10px;
+        }
+
+        .tip-item strong {
+            color: #ffffff;
+        }
+
+        .final-note {
+            background: rgba(161, 161, 161, 0.1);
+            border-radius: 24px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            text-align: center;
+            border: 1px solid rgba(161, 161, 161, 0.3);
+        }
+
+        .final-note i {
+            font-size: 2rem;
+            color: #a1a1a1;
+            margin-bottom: 0.8rem;
+        }
+
+        hr {
+            border-color: rgba(161, 161, 161, 0.2);
+            margin: 1.5rem 0;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 700px) {
+            .container {
+                padding: 1rem;
+            }
+            .page-header h1 {
+                font-size: 1.8rem;
+            }
+            .content-card {
+                padding: 1.2rem;
+            }
+            .section-title {
+                font-size: 1.4rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<canvas id="arCanvas"></canvas>
+
+<div class="container">
+    <div class="page-header">
+        <div class="header-top">
+            <div class="seller-btn">
+                <i class="fas fa-user-shield"></i> Продавец: ShizzyBoost
+            </div>
+        </div>
+        <h1><i class="fas fa-eye-slash"></i> Скрытие ЧСП проекта</h1>
+        <p>Полное руководство по маскировке черного списка — от смены личности до безопасной игры</p>
+    </div>
+
+    <div class="content-card">
+        <!-- Вступление -->
+        <div class="warning-box">
+            <h3><i class="fas fa-exclamation-triangle"></i> За что могут дать ЧСП?</h3>
+            <ul>
+                <li>Многочисленную покупку аккаунтов/виртов (от 5+ раз)</li>
+                <li>Продажу виртов в любом количестве</li>
+                <li>Продажу аккаунтов/аккаунта в любом количестве</li>
+                <li>Использование рванки (даже одного бана будет достаточно)</li>
+                <li>Массовые серьёзные нарушения, в частности, читы</li>
+                <li>И так далее...</li>
+            </ul>
+        </div>
+
+        <p style="margin-bottom: 1rem;">Если вы попали в ЧС проекта — <strong>не паникуйте</strong>. Вас будут палить только в двух случаях:</p>
+        <ul class="list-styled" style="margin-bottom: 1.5rem;">
+            <li>Вы вызвали подозрение, и админы решили проверить ваши логи, и после нескольких проверок нашли у вас блокировки за ЧСП.</li>
+            <li>Вы сами себя сдали, или информация о вашем нахождении в ЧСП кто-то слил.</li>
+        </ul>
+
+        <!-- Два варианта -->
+        <div class="section-title">
+            <i class="fas fa-code-branch"></i> Два подхода к скрытию
+        </div>
+
+        <!-- Вариант 1 -->
+        <div class="method-card">
+            <h3><i class="fas fa-moon"></i> Первый вариант — Пассивная игра</h3>
+            <p>Подходит, если вы не вызываете подозрений, спокойно играете и хотите продолжать в том же духе.</p>
+            <ul class="list-styled">
+                <li><strong>Сменить IP:</strong> если динамический интернет — просто перезагрузите роутер. Если статичный — используйте прокси (в интернете их много).</li>
+                <li><strong>Чистая почта</strong> для привязки аккаунта.</li>
+                <li><strong>Новый форумник</strong> (по желанию — новый ВК и ютуб-канал).</li>
+                <li><strong>Не распространяйтесь</strong> о своей ЧСП-истории никому.</li>
+            </ul>
+            <p style="margin-top: 1rem; color: #aaa;"><i class="fas fa-info-circle"></i> Худшее, что может случиться — вызов на проверку в дискорд. Об этом будет отдельная тема.</p>
+        </div>
+
+        <!-- Вариант 2 -->
+        <div class="method-card">
+            <h3><i class="fas fa-fire"></i> Второй вариант — Активная игра (ловля, капты, лидерство)</h3>
+            <p>Для тех, кто собирается ловить, ходить на капты, занимать посты лидеров или администраторов.</p>
+            <ul class="list-styled">
+                <li><strong>Смена IP:</strong> перезагружайте роутер несколько раз или купите ВДС (рекомендуется ruvds).</li>
+                <li><strong>Новый, чистый форумник</strong> — не заходите со старого IP на новый форумник и наоборот (логируются все входы).</li>
+                <li><strong>Чистый YouTube-канал</strong> (можно использованный для других игр, кроме Аризоны, чтобы не выглядеть новорегом).</li>
+                <li><strong>Новая сборка</strong> — изменённые /pagesize + /fontsize, желательно другой шрифт игры.</li>
+                <li><strong>Создайте ложную личность:</strong> придумайте псевдоним, манеру речи, слова-паразиты.</li>
+            </ul>
+        </div>
+
+        <!-- Как не вызывать подозрений -->
+        <div class="section-title">
+            <i class="fas fa-user-secret"></i> Как НЕ вызывать подозрений
+        </div>
+        <div class="tips-grid">
+            <div class="tip-item">
+                <i class="fas fa-comment-slash"></i> <strong>Не оскорбляйте</strong> на форуме, будьте спокойны.
+            </div>
+            <div class="tip-item">
+                <i class="fas fa-theater-masks"></i> <strong>Подстраивайтесь</strong> под новый характер, меняйте манеру речи.
+            </div>
+            <div class="tip-item">
+                <i class="fas fa-id-card"></i> <strong>Ложное имя и псевдоним</strong> — везде одинаковые.
+            </div>
+            <div class="tip-item">
+                <i class="fas fa-microphone-alt"></i> <strong>Голос</strong> — если старый знают, старайтесь менять интонацию.
+            </div>
+            <div class="tip-item">
+                <i class="fas fa-trash-alt"></i> <strong>Полная чистка ПК</strong> — сборки, Google-аккаунты, кэш.
+            </div>
+            <div class="tip-item">
+                <i class="fas fa-shield-alt"></i> <strong>Готовность к проверкам</strong> на софт и наличие ЧСП.
+            </div>
+        </div>
+
+        <!-- Что делать, если разоблачили -->
+        <div class="section-title">
+            <i class="fas fa-sync-alt"></i> Если вас всё-таки раскрыли
+        </div>
+        <div class="method-card" style="background: rgba(20,20,30,0.5);">
+            <h3><i class="fas fa-user-plus"></i> Создавайте новую личность заново</h3>
+            <ul class="list-styled">
+                <li>Заранее подготовьте аккаунты: игровой, Google, форумник, соцсети.</li>
+                <li>Первое время занимайтесь «фигнёй» на сервере — не показывайте проф. навыки.</li>
+                <li>Пишите жалобы, общайтесь, заполняйте форумник, чтобы перестать быть ноунеймом.</li>
+                <li>Спустя пару недель спокойно возвращайтесь к любимому делу.</li>
+            </ul>
+            <p style="margin-top: 1rem;"><i class="fas fa-quote-left"></i> Главное — не сдаваться и не бояться. ЧСП скрыть гораздо проще, чем думает большинство игроков.</p>
+        </div>
+
+        <!-- Блок с чисткой и подготовкой -->
+        <div class="section-title">
+            <i class="fas fa-broom"></i> Подготовка перед новой личностью
+        </div>
+        <ul class="list-styled">
+            <li><strong>Чистый компьютер:</strong> удалите старые сборки, почистите кэш браузеров, куки, сохранённые пароли.</li>
+            <li><strong>Новые аккаунты:</strong> почта, YouTube (не связанный с Аризоной), форумник, ВК (по желанию).</li>
+            <li><strong>Изменённые настройки игры:</strong> /pagesize, /fontsize, шрифт — сделайте уникальными.</li>
+            <li><strong>ВДС/прокси:</strong> для статичного IP или дополнительной анонимности.</li>
+            <li><strong>Манера общения:</strong> избавьтесь от старых фраз, добавьте новые слова-паразиты.</li>
+        </ul>
+
+        <!-- Финальный совет -->
+        <div class="final-note">
+            <i class="fas fa-chess-queen"></i>
+            <h3 style="margin: 0.5rem 0;">Не дайте ЧСП сломать вашу игру</h3>
+            <p>Следуя этим рекомендациям, вы сможете скрыть свой ЧС на ближайшие месяцы и спокойно заниматься любимым делом. Помните: паника и неосторожность — главные враги.</p>
+            <hr style="margin: 1rem 0;">
+            <p style="font-size: 0.85rem; color: #aaa;"><i class="fas fa-gavel"></i> Информация предоставлена в ознакомительных целях. Соблюдайте правила проекта.</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ----- АНИМИРОВАННЫЙ ФОН "ARZ" -----
+    const canvas = document.getElementById('arCanvas');
+    let ctx = canvas.getContext('2d');
+    let width, height;
+    let particles = [];
+
+    function initCanvas() {
+        width = window.innerWidth;
+        height = window.innerHeight;
+        canvas.width = width;
+        canvas.height = height;
+
+        const particleCount = Math.min(70, Math.floor(width * height / 11000));
+        for (let i = 0; i < particleCount; i++) {
+            particles.push({
+                x: Math.random() * width,
+                y: Math.random() * height,
+                vx: (Math.random() - 0.5) * 0.6,
+                vy: (Math.random() - 0.5) * 0.6,
+                size: 20 + Math.random() * 28,
+                opacity: 0.08 + Math.random() * 0.18,
+                text: ['ARZ', 'HUB', 'ЧСП'][Math.floor(Math.random() * 3)],
+                rotation: Math.random() * Math.PI * 2,
+                rotSpeed: (Math.random() - 0.5) * 0.01
+            });
+        }
+    }
+
+    function drawParticles() {
+        if (!ctx) return;
+        ctx.clearRect(0, 0, width, height);
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+
+        for (let p of particles) {
+            p.x += p.vx;
+            p.y += p.vy;
+            p.rotation += p.rotSpeed;
+
+            if (p.x < -70) p.x = width + 70;
+            if (p.x > width + 70) p.x = -70;
+            if (p.y < -70) p.y = height + 70;
+            if (p.y > height + 70) p.y = -70;
+
+            ctx.save();
+            ctx.translate(p.x, p.y);
+            ctx.rotate(p.rotation);
+            ctx.font = `${p.size}px "Inter", "Segoe UI", monospace`;
+            ctx.fillStyle = `rgba(161, 161, 161, ${p.opacity})`;
+            ctx.fillText(p.text, 0, 0);
+            ctx.restore();
+        }
+        requestAnimationFrame(drawParticles);
+    }
+
+    function handleResize() {
+        width = window.innerWidth;
+        height = window.innerHeight;
+        canvas.width = width;
+        canvas.height = height;
+        particles = [];
+        const particleCount = Math.min(70, Math.floor(width * height / 11000));
+        for (let i = 0; i < particleCount; i++) {
+            particles.push({
+                x: Math.random() * width,
+                y: Math.random() * height,
+                vx: (Math.random() - 0.5) * 0.6,
+                vy: (Math.random() - 0.5) * 0.6,
+                size: 20 + Math.random() * 28,
+                opacity: 0.08 + Math.random() * 0.18,
+                text: ['A', 'R', 'Z'][Math.floor(Math.random() * 3)],
+                rotation: Math.random() * Math.PI * 2,
+                rotSpeed: (Math.random() - 0.5) * 0.01
+            });
+        }
+    }
+
+    window.addEventListener('resize', handleResize);
+    initCanvas();
+    drawParticles();
+</script>
+</body>
+</html>
